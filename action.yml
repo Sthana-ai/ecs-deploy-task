@@ -24,7 +24,7 @@ runs:
   using: "composite"
   steps:
     - name: Substitute environment variables
-      uses: ubuntu-latest
+      shell: bash
       run: |
         originalfile="${{ inputs.task-definition }}"
         temporaryFile=$(mktemp)
