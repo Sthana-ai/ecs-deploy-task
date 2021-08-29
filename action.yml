@@ -23,7 +23,15 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: deploy-task
+    - name: Substitute environment variables
+      uses: ubuntu-latest
+      run: |
+        originalfile="${{ inputs.task-definition }}"
+        temporaryFile=$(mktemp)
+        cp --attributes-only --preserve $originalfile $temporaryFile
+        cat $originalfile | envsubst | tee $temporaryFile && mv $temporaryFile $originalfile
+    - name: Deploy task
+      id: deploy-task
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ inputs.task-definition }}
