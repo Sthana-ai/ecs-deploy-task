@@ -8,13 +8,13 @@ inputs:
     description: "The name of the ECS service to deploy to. The action will only register the task definition if no service is given."
     required: false
   cluster:
-    description: "The name of the ECS service's cluster.  Will default to the 'default' cluster"
+    description: "The name of the ECS service's cluster. Will default to the 'default' cluster"
     required: false
   wait-for-service-stability:
     description: 'Whether to wait for the ECS service to reach stable state after deploying the new task definition. Valid value is "true". Will default to not waiting.'
     required: false
   wait-for-minutes:
-    description: "How long to wait for the ECS service to reach stable state, in minutes (default: 30 minutes, max: 6 hours). For CodeDeploy deployments, any wait time configured in the CodeDeploy deployment group will be added to this value."
+    description: "How long to wait for the ECS service to reach stable state, in minutes (default: 30 minutes, max: 6 hours)."
     required: false
 outputs:
   task-definition-arn:
@@ -25,16 +25,12 @@ runs:
   steps:
     - name: Substitute environment variables
       shell: bash
-      run: |
-        originalfile="${{ inputs.task-definition }}"
-        temporaryFile=$(mktemp)
-        cp --attributes-only --preserve $originalfile $temporaryFile
-        cat $originalfile | envsubst | tee $temporaryFile && mv $temporaryFile $originalfile
+      run: envsubst < "${{ inputs.task-definition }}" > "_task.json"
     - name: Deploy task
       id: deploy-task
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: ${{ inputs.task-definition }}
+        task-definition: _task.json
         service: ${{ inputs.service }}
         cluster: ${{ inputs.cluster }}
         wait-for-service-stability: ${{ inputs.wait-for-service-stability }}
