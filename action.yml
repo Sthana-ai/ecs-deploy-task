@@ -35,3 +35,4 @@ runs:
         cluster: ${{ inputs.cluster }}
         wait-for-service-stability: ${{ inputs.wait-for-service-stability }}
         wait-for-minutes: ${{ inputs.wait-for-minutes }}
+
